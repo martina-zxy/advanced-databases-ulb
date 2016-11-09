@@ -1,4 +1,418 @@
+<!DOCTYPE>
 <html>
-<title>
-Test 2</title>
+<head>
+  <link rel="stylesheet" href="./css/paper.min.css">
+  <link href="./css/signin.css" rel="stylesheet">
+  <title></title>
+  
+</head>
+<body>
+  <div class="container">
+
+    <div class="form-signin">
+      <h2 class="form-signin-heading">Please sign in</h2>
+      <label for="inputEmail" class="sr-only">Email address</label>
+      <input type="email" id="txtEmail" class="form-control" placeholder="Email address" required autofocus>
+      <label for="inputPassword" class="sr-only">Password</label>
+      <input type="password" id="txtPassword" class="form-control" placeholder="Password" required>
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" value="remember-me"> Remember me
+        </label>
+      </div>
+      <button class="btn btn-lg btn-primary btn-block" id="btnSignin">Sign in</button>
+      <!-- <button class="btn btn-lg btn-primary btn-block" id="btnRegister">Register</button> -->
+      Do not have an account? Register <a id="btnModal" data-toggle="modal" data-target="#modalRegister" >here</a>
+    </div>
+
+        <!-- Modal -->
+    <div class="modal fade" id="modalRegister" tabindex="-1" role="dialog" aria-labelledby="modalTitle">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <!-- Modal Header -->
+          <div class="modal-header">
+              <button type="button" class="close" 
+                 data-dismiss="modal">
+                     <span aria-hidden="true">&times;</span>
+                     <span class="sr-only">Close</span>
+              </button>
+              <h4 class="modal-title" id="modalTitle">
+                  Register
+              </h4>
+          </div>
+          
+          <!-- Modal Body -->
+          <div class="modal-body">
+              
+              <!-- <form action="#" method="post" class="form-horizontal" id="formRegister" role="form"> -->
+              <div class="form-horizontal">
+                <div class="form-group">
+                  <label  class="col-sm-2 control-label"
+                            for="regEmail">Email</label>
+                  <div class="col-sm-10">
+                      <input type="email" class="form-control" 
+                      id="regEmail" placeholder="Email"/>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label"
+                        for="regUsername" >Username</label>
+                  <div class="col-sm-10">
+                      <input type="text" class="form-control"
+                          id="regUsername" placeholder="Username"/>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label"
+                        for="regPassword" >Password</label>
+                  <div class="col-sm-10">
+                      <input type="password" class="form-control"
+                          id="regPassword" placeholder="Password"/>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-offset-2 col-sm-10">
+                    <button class="btn btn-default" id="btnRegister">Register</button>
+                  </div>
+                </div>
+              </div>
+              <!-- </form> -->
+            </div>
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- /container -->
+  <script src="https://www.gstatic.com/firebasejs/3.5.0/firebase.js"></script>
+  <script type="text/javascript" src="./js/jquery.min.js.download"></script>
+  
+  <script type="text/javascript" src="./js/firebase_initialization.js"></script>
+  <script type="text/javascript" src="./js/paper.min.js.download"></script>
+  
+  <script type="text/javascript">
+  
+    $(document).ready(function(){
+      
+      var username = '';
+      //  $('#formRegister').submit(function(e){
+      //   console.log("Register");
+      //     e.preventdefault();
+      //     // 
+      // });
+
+      $('#btnSignin').click(function(){
+
+        var email = $('#txtEmail').val();
+        var password = $('#txtPassword').val();
+        if (email.length < 4) {
+          alert('Please enter an email address.');
+          return;
+        }
+        if (password.length < 4) {
+          alert('Please enter a password.');
+          return;
+        }
+        // Sign in with email and pass.
+        // [START authwithemail]
+        firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          // [START_EXCLUDE]
+          if (errorCode === 'auth/wrong-password') {
+            alert('Wrong password.');
+          } else {
+            alert(errorMessage);
+          }
+          console.log(error);
+          // document.getElementById('quickstart-sign-in').disabled = false;
+          // [END_EXCLUDE]
+        });
+        // [END authwithemail]
+      });
+
+      // function writeUserData(userId, name, email, imageUrl) {
+        
+      // }
+
+      $('#btnRegister').click(function(){
+        var email = $('#regEmail').val();
+        var password = $('#regPassword').val();
+        username = $('#regUsername').val();
+        if (username.length < 4) {
+          alert('Please enter an username.');
+          return;
+        }
+        if (email.length < 4) {
+          alert('Please enter an email address.');
+          return;
+        }
+        if (password.length < 4) {
+          alert('Please enter a password.');
+          return;
+        }
+
+        //function writeUserData(userId, name, email) {
+        // var ref = firebase.database().ref();
+        // console.log(ref);
+        // ref.createUser({
+        //   email    : email,
+        //   password : password
+        // }, function(error, authData) {
+        //   if (error) {
+        //     console.log("Error creating user:", error);
+        //   } else {
+        //     // save the user's profile into the database so we can list users,
+        //     // use them in Security and Firebase Rules, and show profiles
+        //     ref.child("users").child(authData.uid).set({
+        //       provider: authData.provider,
+        //       name: username
+        //     });
+        //   }
+        // });
+
+       
+  // }
+
+        // Sign in with email and pass.
+        // [START createwithemail]
+
+        var error = false;
+
+        firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+          // Handle Errors here.
+          error = true;
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          // [START_EXCLUDE]
+          if (errorCode == 'auth/weak-password') {
+            alert('The password is too weak.');
+          } else {
+            alert(errorMessage);
+          }
+          console.log(error);
+
+          // [END_EXCLUDE]
+        });
+
+      // [END createwithemail]
+      });
+
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+
+          if (username != '') {
+            firebase.database().ref('users/' + user.uid).set({
+              username: username,
+              email: user.email,
+              profile_picture : user.photoURL
+            }).then(function(e){
+              window.location.replace("timeline.html");    
+            });
+          } else {
+            window.location.replace("timeline.html");
+          }
+          
+        }  
+        // // [START_EXCLUDE silent]
+        // document.getElementById('quickstart-verify-email').disabled = true;
+        // // [END_EXCLUDE]
+        // if (user) {
+        //   // User is signed in.
+        //   var displayName = user.displayName;
+        //   var email = user.email;
+        //   var emailVerified = user.emailVerified;
+        //   var photoURL = user.photoURL;
+        //   var isAnonymous = user.isAnonymous;
+        //   var uid = user.uid;
+        //   var providerData = user.providerData;
+        //   // [START_EXCLUDE silent]
+        //   document.getElementById('quickstart-sign-in-status').textContent = 'Signed in';
+        //   document.getElementById('quickstart-sign-in').textContent = 'Sign out';
+        //   document.getElementById('quickstart-account-details').textContent = JSON.stringify(user, null, '  ');
+        //   if (!emailVerified) {
+        //     document.getElementById('quickstart-verify-email').disabled = false;
+        //   }
+        //   // [END_EXCLUDE]
+        // } else {
+        //   // User is signed out.
+        //   // [START_EXCLUDE silent]
+        //   document.getElementById('quickstart-sign-in-status').textContent = 'Signed out';
+        //   document.getElementById('quickstart-sign-in').textContent = 'Sign in';
+        //   document.getElementById('quickstart-account-details').textContent = 'null';
+        //   // [END_EXCLUDE]
+        // }
+        // // [START_EXCLUDE silent]
+        // document.getElementById('quickstart-sign-in').disabled = false;
+        // // [END_EXCLUDE]
+      });
+    });
+
+
+
+    /**
+     * Handles the sign in button press.
+     */
+    function toggleSignIn() {
+      if (firebase.auth().currentUser) {
+        // [START signout]
+        firebase.auth().signOut();
+        // [END signout]
+      } else {
+        var email = document.getElementById('email').value;
+        var password = document.getElementById('password').value;
+        if (email.length < 4) {
+          alert('Please enter an email address.');
+          return;
+        }
+        if (password.length < 4) {
+          alert('Please enter a password.');
+          return;
+        }
+        // Sign in with email and pass.
+        // [START authwithemail]
+        firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          // [START_EXCLUDE]
+          if (errorCode === 'auth/wrong-password') {
+            alert('Wrong password.');
+          } else {
+            alert(errorMessage);
+          }
+          console.log(error);
+          document.getElementById('quickstart-sign-in').disabled = false;
+          // [END_EXCLUDE]
+        });
+        // [END authwithemail]
+      }
+      document.getElementById('quickstart-sign-in').disabled = true;
+    }
+
+    /**
+     * Handles the sign up button press.
+     */
+    function handleSignUp() {
+      var email = document.getElementById('email').value;
+      var password = document.getElementById('password').value;
+      if (email.length < 4) {
+        alert('Please enter an email address.');
+        return;
+      }
+      if (password.length < 4) {
+        alert('Please enter a password.');
+        return;
+      }
+      // Sign in with email and pass.
+      // [START createwithemail]
+      firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // [START_EXCLUDE]
+        if (errorCode == 'auth/weak-password') {
+          alert('The password is too weak.');
+        } else {
+          alert(errorMessage);
+        }
+        console.log(error);
+        // [END_EXCLUDE]
+      });
+      // [END createwithemail]
+    }
+
+    /**
+     * Sends an email verification to the user.
+     */
+    function sendEmailVerification() {
+      // [START sendemailverification]
+      firebase.auth().currentUser.sendEmailVerification().then(function() {
+        // Email Verification sent!
+        // [START_EXCLUDE]
+        alert('Email Verification Sent!');
+        // [END_EXCLUDE]
+      });
+      // [END sendemailverification]
+    }
+
+    function sendPasswordReset() {
+      var email = document.getElementById('email').value;
+      // [START sendpasswordemail]
+      firebase.auth().sendPasswordResetEmail(email).then(function() {
+        // Password Reset Email Sent!
+        // [START_EXCLUDE]
+        alert('Password Reset Email Sent!');
+        // [END_EXCLUDE]
+      }).catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // [START_EXCLUDE]
+        if (errorCode == 'auth/invalid-email') {
+          alert(errorMessage);
+        } else if (errorCode == 'auth/user-not-found') {
+          alert(errorMessage);
+        }
+        console.log(error);
+        // [END_EXCLUDE]
+      });
+      // [END sendpasswordemail];
+    }
+
+    /**
+     * initApp handles setting up UI event listeners and registering Firebase auth listeners:
+     *  - firebase.auth().onAuthStateChanged: This listener is called when the user is signed in or
+     *    out, and that is where we update the UI.
+     */
+    function initApp() {
+      // Listening for auth state changes.
+      // [START authstatelistener]
+      firebase.auth().onAuthStateChanged(function(user) {
+        // [START_EXCLUDE silent]
+        document.getElementById('quickstart-verify-email').disabled = true;
+        // [END_EXCLUDE]
+        if (user) {
+          // User is signed in.
+          var displayName = user.displayName;
+          var email = user.email;
+          var emailVerified = user.emailVerified;
+          var photoURL = user.photoURL;
+          var isAnonymous = user.isAnonymous;
+          var uid = user.uid;
+          var providerData = user.providerData;
+          // [START_EXCLUDE silent]
+          document.getElementById('quickstart-sign-in-status').textContent = 'Signed in';
+          document.getElementById('quickstart-sign-in').textContent = 'Sign out';
+          document.getElementById('quickstart-account-details').textContent = JSON.stringify(user, null, '  ');
+          if (!emailVerified) {
+            document.getElementById('quickstart-verify-email').disabled = false;
+          }
+          // [END_EXCLUDE]
+        } else {
+          // User is signed out.
+          // [START_EXCLUDE silent]
+          document.getElementById('quickstart-sign-in-status').textContent = 'Signed out';
+          document.getElementById('quickstart-sign-in').textContent = 'Sign in';
+          document.getElementById('quickstart-account-details').textContent = 'null';
+          // [END_EXCLUDE]
+        }
+        // [START_EXCLUDE silent]
+        document.getElementById('quickstart-sign-in').disabled = false;
+        // [END_EXCLUDE]
+      });
+      // [END authstatelistener]
+
+      document.getElementById('quickstart-sign-in').addEventListener('click', toggleSignIn, false);
+      document.getElementById('quickstart-sign-up').addEventListener('click', handleSignUp, false);
+      document.getElementById('quickstart-verify-email').addEventListener('click', sendEmailVerification, false);
+      document.getElementById('quickstart-password-reset').addEventListener('click', sendPasswordReset, false);
+    }
+
+    window.onload = function() {
+      // initApp();
+    };
+  </script>
+  
+</body>
 </html>
