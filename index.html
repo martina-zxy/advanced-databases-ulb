@@ -48,6 +48,22 @@
               <div class="form-horizontal">
                 <div class="form-group">
                   <label  class="col-sm-2 control-label"
+                            for="regName">Fullname</label>
+                  <div class="col-sm-10">
+                      <input type="text" class="form-control" 
+                      id="regName" placeholder="Fullname"/>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label  class="col-sm-2 control-label"
+                            for="regName">Phone</label>
+                  <div class="col-sm-10">
+                      <input type="text" class="form-control" 
+                      id="regPhone" placeholder="Phone number"/>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label  class="col-sm-2 control-label"
                             for="regEmail">Email</label>
                   <div class="col-sm-10">
                       <input type="email" class="form-control" 
@@ -93,7 +109,8 @@
   
     $(document).ready(function(){
       
-      var username = '';
+      var newUser = false;
+      var userdata = null;
       //  $('#formRegister').submit(function(e){
       //   console.log("Register");
       //     e.preventdefault();
@@ -136,11 +153,21 @@
       // }
 
       $('#btnRegister').click(function(){
+        var name = $('#regName').val();
+        var phone = $('#regPhone').val();
         var email = $('#regEmail').val();
         var password = $('#regPassword').val();
-        username = $('#regUsername').val();
+        var username = $('#regUsername').val();
         if (username.length < 4) {
-          alert('Please enter an username.');
+          alert('Please enter a username.');
+          return;
+        }
+        if (name.length < 4) {
+          alert('Please enter your name.');
+          return;
+        }
+        if (phone.length < 4) {
+          alert('Please enter your phone.');
           return;
         }
         if (email.length < 4) {
@@ -152,6 +179,13 @@
           return;
         }
 
+        newUser = true;
+
+        userdata = {
+          username : username,
+          name : name,
+          phone : phone,
+        }
         //function writeUserData(userId, name, email) {
         // var ref = firebase.database().ref();
         // console.log(ref);
@@ -200,19 +234,20 @@
 
       firebase.auth().onAuthStateChanged(function(user) {
         if (user) {
-
-          if (username != '') {
+          if (newUser) {
             firebase.database().ref('users/' + user.uid).set({
-              username: username,
+              username: userdata.username,
               email: user.email,
+              name: userdata.name,
+              phone: userdata.phone,
               profile_picture : user.photoURL
             }).then(function(e){
+              newUser = false;
               window.location.replace("timeline.html");    
             });
           } else {
             window.location.replace("timeline.html");
           }
-          
         }  
         // // [START_EXCLUDE silent]
         // document.getElementById('quickstart-verify-email').disabled = true;

@@ -1,9 +1,9 @@
 // Initialize Firebase
 var config = {
-apiKey: "AIzaSyA4_CxT224itP_cylL8gI-zQcAaOahDju8",
-authDomain: "trade-b1ad2.firebaseapp.com",
-databaseURL: "https://trade-b1ad2.firebaseio.com",
-storageBucket: "trade-b1ad2.appspot.com",
-messagingSenderId: "239663430620"
+	apiKey: "AIzaSyABGqByWAm1L5FRx_E6hSbd38hspXFLPPY",
+	authDomain: "trader-530e1.firebaseapp.com",
+	databaseURL: "https://trader-530e1.firebaseio.com",
+	storageBucket: "trader-530e1.appspot.com",
+	messagingSenderId: "16224704910"
 };
 firebase.initializeApp(config);

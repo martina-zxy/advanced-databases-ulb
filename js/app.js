@@ -1,28 +1,28 @@
-
-// Initialize Firebase
-var config = {
-apiKey: "AIzaSyA4_CxT224itP_cylL8gI-zQcAaOahDju8",
-authDomain: "trade-b1ad2.firebaseapp.com",
-databaseURL: "https://trade-b1ad2.firebaseio.com",
-storageBucket: "trade-b1ad2.appspot.com",
-messagingSenderId: "239663430620"
-};
-
-firebase.initializeApp(config);
 var db = firebase.database();
 var userId;
 $(document).ready(function(){	
+	var userdata = null;
 
 	firebase.auth().onAuthStateChanged(function(user) {
 	    if (user){
 	    	console.log(user);
 	    	userId = user.uid;
 
+	    	firebase.database().ref('/users/' + userId).once('value').then(function(snapshot) {
+			  userdata = snapshot.val();
+			  $('#username-navbar').text(userdata.username);
+			  $('#username-sidebar').text('@' + userdata.username);
+			  $('#user-fullname').text(userdata.name);
+			});
+
 			firebase.database().ref('/posts').on('child_added', function (snap) {
-				
 
 		        prependPost(snap);
 		    });
+
+			firebase.database().ref('/posts').once('value').then(function(snapshot) {
+			  console.log(snapshot.val());
+			});
 
 			firebase.database().ref('/posts').once('value').then(function(snapshot) {
 			  console.log(snapshot.val());
@@ -60,7 +60,8 @@ $(document).ready(function(){
     	console.log("Snapshot full date: " + new Date(timestamp));
 
     	var postData = {
-		    author: 'username',
+		    author: userdata.name,
+		    uname: userdata.username,
 		    uid: firebase.auth().currentUser.uid,
 	    	body: 'body',
 	    	title: title,
@@ -89,7 +90,7 @@ $(document).ready(function(){
 		$('#postPrice').val('');	
 		$('#postDescription').val('');	  	
 		$('#txtBtnShare').text('Share');
-    	$('#txtBtnCancel').addClass('hide');
+    	$('#btnCancel').addClass('hide');
     });
 
     function prependPost(post) {
@@ -108,7 +109,7 @@ $(document).ready(function(){
 		                "<div class=\"post-content\">" +  
 		                	"<input type=\"hidden\" id=\"uid-"+ key +"\" value=\"" + post.uid + "\">" +
 			                "<span class=\"name\" id=\"name-"+ key +"\">" + post.author + "</span>" +
-			                "<span class=\"username\" id=\"username-"+ key +"\">@" + post.author + "</span>" +
+			                "<span class=\"username\" id=\"username-"+ key +"\"> - @" + post.uname + "</span>" +
 			                "<div class=\"post title\" id=\"title-"+ key +"\">" + post.title + "</div>" +
 			                "<div class=\"post\" id=\"price-"+ key +"\">&euro;" + post.price + "</div>" +
 			                "<div class=\"post\" id=\"description-"+ key +"\">" + post.description + "</div>" +
