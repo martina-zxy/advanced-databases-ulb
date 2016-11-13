@@ -114,7 +114,7 @@
 }
 
 .input-group {
-  margin-right: 10px;
+  /*margin-right: 10px;*/
 }
 
 .input-group input {
@@ -130,8 +130,8 @@
 
 .input-group-addon {
   background-color: #fff;
-  border: 1px solid #c0c0c0;
-  border-radius: 10em;
+  border: 2px solid #c0c0c0;
+  
 }
 
 .title{

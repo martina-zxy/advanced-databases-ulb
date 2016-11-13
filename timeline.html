@@ -104,8 +104,20 @@
                 </li>
               </ul>
           </li>
-          <li>
-            <a href="#"><img class="navbar-avatar" src="./img/e7bbf514106dc2fd9ddb4e8160a72e8c.png" alt="Profile"><span id="username-navbar"></span></a>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle navbar-icons" data-toggle="dropdown"><img class="navbar-avatar" src="./img/e7bbf514106dc2fd9ddb4e8160a72e8c.png" alt="Profile" ><span id="username-navbar"></span></a>
+            <ul id="messa" class="dropdown-menu" role="menu">
+                <li>
+                  <a href="#">
+                    <h6><b>My post</b></h6>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" id="btnSignout">
+                    <h6><b>Signout</b></h6>
+                  </a>
+                </li>
+              </ul>
           </li>
         </ul>
       </div>
@@ -134,7 +146,7 @@
             <h5 class="username" id="username-sidebar"></h5>
           </div>
         </div><br>
-        <div class="panel panel-default">
+        <!-- <div class="panel panel-default">
           <div class="panel-heading">
             <h3 class="panel-title" id="bigOne"><b>Trends</b></h3>
           </div>
@@ -147,7 +159,7 @@
                 <li><a href="#">#Javascript</a></li>
               </ul>
           </div>
-        </div>
+        </div> -->
       </div>
       <div class="col-lg-9 col-md-9">
         <div class="panel panel-default">
@@ -156,7 +168,11 @@
               <div class="form-group">
                 <input type="hidden" id="editPostId">
                 <input class="form-control" type="text" id="postTitle" placeholder="Title"/>
-                <input class="form-control" type="text" id="postPrice" placeholder="Price"/>
+                <div class="input-group">
+                  <span class="input-group-addon">&euro;</span>
+                  <input class="form-control" type="text" id="postPrice" placeholder="Price"/>
+                </div>
+                
                 <textarea id="postDescription" rows="1" cols="10" class="form-control" placeholder="Description" style="overflow: hidden; word-wrap: break-word; height: 56px;"></textarea>
               </div>
               <button id="share" class="btn btn-success">

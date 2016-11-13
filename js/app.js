@@ -111,18 +111,22 @@ $(document).ready(function(){
 			                "<span class=\"name\" id=\"name-"+ key +"\">" + post.author + "</span>" +
 			                "<span class=\"username\" id=\"username-"+ key +"\"> - @" + post.uname + "</span>" +
 			                "<div class=\"post title\" id=\"title-"+ key +"\">" + post.title + "</div>" +
-			                "<div class=\"post\" id=\"price-"+ key +"\">&euro;" + post.price + "</div>" +
+			                "<div class=\"post\" id=\"price-"+ key +"\">&euro;<span>" + post.price + "</span></div>" +
 			                "<div class=\"post\" id=\"description-"+ key +"\">" + post.description + "</div>" +
 		                "</div>" +
-		                "<div class=\"right-content\">" +
-		                  	"<span>" + '20 min' + "</span>" +
-		                "</div>" +
+		                // "<div class=\"right-content\">" +
+		                //   	"<span>" + '20 min' + "</span>" +
+		                // "</div>" +
 	              	"</div>" +
 	              	"<div class=\"actions\">" +
-	                	"<div class=\"actions-content\">" +
-	                		"<a class=\"linkReserve\" id=\""+ key +"\" >" +
-		                    	"<i class=\"fa fa-heart\"></i>" +
-		                  	"</a>";
+	                	"<div class=\"actions-content\">";
+	                		// "<a class=\"linkReserve\" id=\""+ key +"\" >";
+		if (post.heartCount > 0) {
+			add = add + "<a class=\"linkReserve\" id=\""+ key +"\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Reserved\"> <i class=\"fa fa-heart active\"></i>";
+		} else {
+			add = add + "<a class=\"linkReserve\" id=\""+ key +"\" > <i class=\"fa fa-heart \"></i>";
+		}
+		    add = add + "</a>";
 		if (post.uid == firebase.auth().currentUser.uid) {
 			add = add + "<a href=\"#new-micropost\" class=\"linkUpdate\" id=\""+ key +"\" >" +
 		                    	"<i class=\"fa fa-pencil\"></i>" +
@@ -157,7 +161,7 @@ $(document).ready(function(){
 		// console.log($('#description-'+id).text());
 
     	$('#postTitle').val($('#title-'+id).text());
-    	$('#postPrice').val($('#price-'+id).text());
+    	$('#postPrice').val($('#price-'+id+' span').text());
     	$('#postDescription').val($('#description-'+id).text());
     	$('#editPostId').val(id);
     	
@@ -179,7 +183,7 @@ $(document).ready(function(){
     	// firebase.database().ref('/posts/'+ id).remove();
     	// firebase.database().ref('/user-posts/'+ userId + '/' + id).remove();
 
-    	var reserveRef = db.ref('/posts/'+ id + '/starCount');
+    	var reserveRef = db.ref('/posts/'+ id + '/heartCount');
 		reserveRef.transaction(function (current_value) {
 			if(current_value < 3) {
 				console.log(current_value);
@@ -189,7 +193,8 @@ $(document).ready(function(){
 				alert ('Maximum reservation number has been reached.');
 			}
 		}).then(function(){
-			console.log('lala');
+			
+			alert('Reserved! The user will contact you soon!');
 		});
 
 		
@@ -205,14 +210,28 @@ $(document).ready(function(){
     	$('#txtBtnShare').text('Share');
     });
 
+    $('#btnSignout').click(function(){
+    	firebase.auth().signOut().then(function() {
+		  window.location.replace('index.html');
+		}, function(error) {
+		  console.error('Sign Out Error', error);
+		});
+
+    });
+
 	firebase.database().ref('/posts').on('child_changed', function (snap) {
 		console.log(snap);
 		var key = snap.key;
 		var post = snap.val();
 
 		$('#title-'+key).text(post.title);
-		$('#price-'+key).text(post.price);
+		$('#price-'+key+' span').text(post.price);
 		$('#description-'+key).text(post.description);
+
+		if (post.heartCount > 0) {
+			$('a.linkReserve#'+key+' i').addClass('active');	
+		}
+		
 		
 	});
 
