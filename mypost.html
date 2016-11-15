@@ -108,7 +108,7 @@
             <a href="#" class="dropdown-toggle navbar-icons" data-toggle="dropdown"><img class="navbar-avatar" src="./img/e7bbf514106dc2fd9ddb4e8160a72e8c.png" alt="Profile" ><span id="username-navbar"></span></a>
             <ul id="messa" class="dropdown-menu" role="menu">
                 <li>
-                  <a href="mypost.html">
+                  <a href="#">
                     <h6><b>My post</b></h6>
                   </a>
                 </li>
@@ -162,28 +162,6 @@
         </div> -->
       </div>
       <div class="col-lg-9 col-md-9">
-        <div class="panel panel-default">
-          <div id="new-micropost" class="panel-body">
-            <!-- <form role="form"> -->
-              <div class="form-group">
-                <input type="hidden" id="editPostId">
-                <input class="form-control" type="text" id="postTitle" placeholder="Title"/>
-                <div class="input-group">
-                  <span class="input-group-addon">&euro;</span>
-                  <input class="form-control" type="text" id="postPrice" placeholder="Price"/>
-                </div>
-                
-                <textarea id="postDescription" rows="1" cols="10" class="form-control" placeholder="Description" style="overflow: hidden; word-wrap: break-word; height: 56px;"></textarea>
-              </div>
-              <button id="share" class="btn btn-success">
-                <i class="fa fa-send-o"></i> <b id="txtBtnShare">Share</b>
-              </button>
-              <button id="btnCancel" class="btn btn-success hide">
-                <b>Cancel</b>
-              </button>
-            <!-- </form> -->
-          </div>
-        </div>
         <div id="microposts" class="feed">
             <div class="micropost">
               <div class="content">
@@ -213,7 +191,36 @@
                     <i class="fa fa-heart"></i>
                   </a>
                 </div>
+                <div class="actions-content">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Firstname</th>
+                        <th>Lastname</th>
+                        <th>Email</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>John</td>
+                        <td>Doe</td>
+                        <td>john@example.com</td>
+                      </tr>
+                      <tr>
+                        <td>Mary</td>
+                        <td>Moe</td>
+                        <td>mary@example.com</td>
+                      </tr>
+                      <tr>
+                        <td>July</td>
+                        <td>Dooley</td>
+                        <td>july@example.com</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
+              
             </div>
           </div>
       </div>
@@ -223,7 +230,7 @@
   <script type="text/javascript" src="./js/jquery.min.js.download"></script>
   <script src="https://www.gstatic.com/firebasejs/3.5.3/firebase.js"></script>
   <script type="text/javascript" src="./js/firebase_initialization.js"></script>
-  <script type="text/javascript" src="./js/app.js"></script>
+  <script type="text/javascript" src="./js/mypost.js"></script>
   <script type="text/javascript" src="./js/paper.min.js.download"/>
   
   <script type="text/javascript" src="./js/jquery.autosize.min.js.download"></script>

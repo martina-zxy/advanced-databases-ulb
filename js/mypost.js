@@ -9,28 +9,16 @@ $(document).ready(function(){
 	    	userId = user.uid;
 
 	    	firebase.database().ref('/users/' + userId).once('value').then(function(snapshot) {
-	    		
-				userdata = snapshot.val();
-				userdata.key = userId;	
-				console.log(userdata);
-				
-				$('#username-navbar').text(userdata.username);
-				$('#username-sidebar').text('@' + userdata.username);
-				$('#user-fullname').text(userdata.name);
+			  userdata = snapshot.val();
+			  $('#username-navbar').text(userdata.username);
+			  $('#username-sidebar').text('@' + userdata.username);
+			  $('#user-fullname').text(userdata.name);
 			});
 
-			firebase.database().ref('/posts').on('child_added', function (snap) {
+			firebase.database().ref('/user-posts/' + userId).on('child_added', function (snap) {
 
 		        prependPost(snap);
 		    });
-
-			firebase.database().ref('/posts').once('value').then(function(snapshot) {
-			  console.log(snapshot.val());
-			});
-
-			firebase.database().ref('/posts').once('value').then(function(snapshot) {
-			  console.log(snapshot.val());
-			});
 	    } else {
 	    	window.location.replace('index.html');	
 	    }
@@ -176,6 +164,7 @@ $(document).ready(function(){
     });
 
     $('#microposts').on('click', 'a.linkReserve', function() {
+
     	var id = this.id;
     	var reserved = false;
     	var currentHeartCount;
@@ -184,16 +173,6 @@ $(document).ready(function(){
     		alert("You can not reserve your own post!");
     		return;
     	}
-
-    // 	if(postKey == "" || postKey == null) {
-	  	// 	postKey = firebase.database().ref().child('posts').push().key;
-	  	// }	
-
-    // 	var updates = {};
-	  	// updates['/posts/' + postKey] = postData;
-	  	// updates['/user-posts/' + firebase.auth().currentUser.uid + '/' + postKey] = postData;
-
-	  	// firebase.database().ref().update(updates);
 
     	var reserveRef = db.ref('/posts/'+ id + '/heartCount');
 		reserveRef.transaction(function (current_value) {
@@ -209,29 +188,12 @@ $(document).ready(function(){
 			}
 		}).then(function(){
 			if (reserved){
-				var uid = $('#uid-' + id).val();
+
 				var updates = {};
 				
-			  	updates['/user-posts/' + uid + '/' + id + '/heartCount'] = currentHeartCount + 1;
-			  	updates['/posts/' + id + '/heartCount'] = currentHeartCount + 1;
+			  	updates['/user-posts/' + firebase.auth().currentUser.uid + '/' + id + '/heartCount'] = currentHeartCount + 1;
 
-			  	// push reserving user data
-			  	var reservationKey = firebase.database().ref().child('posts/'+ id + '/reservation').push().key;
-
-			  	var reservationData = {
-			  		uid: firebase.auth().currentUser.uid,
-			  		uname: userdata.username,
-				    name: userdata.name,
-				    email: userdata.email,
-				    phone: userdata.phone,
-			    	timestamp: new Date().getTime()
-			  	};
-			  	updates['/user-posts/' + uid + '/' + id + '/reservation/' + reservationKey] = reservationData;
-			  	updates['/posts/'+ id + '/reservation/' + reservationKey] = reservationData;
-
-			  	firebase.database().ref().update(updates).then(function(){
-			  		console.log(updates);
-			  	});
+			  	firebase.database().ref().update(updates);
 
 				alert('Reserved! The user will contact you soon!');
 			}
@@ -270,8 +232,6 @@ $(document).ready(function(){
 
 		if (post.heartCount > 0) {
 			$('a.linkReserve#'+key+' i').addClass('active');	
-		} else {
-			$('a.linkReserve#'+key+' i').removeClass('active');	
 		}
 		
 		
