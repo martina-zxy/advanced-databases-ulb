@@ -20,10 +20,12 @@ $(document).ready(function(){
 		        prependMyPost(snap);
 		        var key = snap.key;
 		        firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + "/" + snap.key + "/reservation").on('child_added', function (snapReserver) {
-		        	appendReserver(key, snapReserver.val());
-		    		// console.log("lala");
-			     //    console.log(snap.val());
+		        	appendReserver(key, snapReserver);
 			    });
+
+			    firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + "/" + snap.key + "/reservation").on('child_removed', function(snapReserver) {
+				    $('tr#'+snapReserver.key).remove();
+				});
 
 		    });
 	    } else {
@@ -149,6 +151,7 @@ $(document).ready(function(){
                         "<th>Name</th>" +
                         "<th>Email</th>" +
                         "<th>Phone</th>" +
+                        "<th>Action</th>" +
                       "</tr>" +
                     "</thead>" +
                     "<tbody>" +
@@ -172,10 +175,44 @@ $(document).ready(function(){
 
     function appendReserver(key, snapReserver) {
     	// $('.micropost#'+key+' .actions .table tbody').append("<div class=\"actions-content\"><h5>ASD - " + key + "</h5></div>");
-    	var reserver = snapReserver;
-    	$('.micropost#'+key+' .actions .table tbody').append("<tr><td>"+ reserver.uname +"</td><td>"+ reserver.name +"</td><td>"+ reserver.email +"</td><td>"+ reserver.phone +"</td></tr>");
+    	var reserver = snapReserver.val();
+    	$('.micropost#'+key+' .actions .table tbody').append("<tr id=\""+snapReserver.key+"\"><td>"+ reserver.uname +"</td><td>"+ reserver.name +"</td><td>"+ reserver.email +"</td><td>"+ reserver.phone +"</td><td><button id=\""+snapReserver.key+"\" class=\"btnReject\">Reject</button></td></tr>");
     	console.log(snapReserver);
     }
+
+    $('#microposts').on('click', 'button.btnReject', function() {
+    	var reservationId = this.id;
+		console.log(reservationId);
+		var postId = this.closest(".micropost").id; 
+    	firebase.database().ref('/posts/'+ postId + "/reservation/" + reservationId).remove();
+    	firebase.database().ref('/user-posts/'+ userId + '/' + postId + "/reservation/" + reservationId).remove();
+
+    	var rejected = false;
+    	var reserveRef = db.ref('/posts/'+ postId + '/heartCount');
+		reserveRef.transaction(function (current_value) {
+			if(current_value >= 1) {
+				currentHeartCount = current_value;
+				console.log(current_value);
+				rejected = true;
+				return (current_value || 1) - 1;				
+			}
+			else {
+				alert ('Do not play with the JS!');
+				return;
+			}
+		}).then(function(){
+			if (rejected){
+
+				var updates = {};
+
+			  	updates['/user-posts/' + userId + '/' + postId + '/heartCount'] = currentHeartCount - 1;
+
+			  	firebase.database().ref().update(updates);
+
+				alert('Reservation has been rejected');
+			}
+		});
+    });
 
     $('#microposts').on('click', 'a.linkDelete', function() {
     	var id = this.id;
@@ -274,6 +311,8 @@ $(document).ready(function(){
 
 		if (post.heartCount > 0) {
 			$('a.linkReserve#'+key+' i').addClass('active');	
+		} else {
+			$('a.linkReserve#'+key+' i').removeClass('active');	
 		}
 		
 		
