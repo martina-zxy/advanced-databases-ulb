@@ -17,7 +17,14 @@ $(document).ready(function(){
 
 			firebase.database().ref('/user-posts/' + userId).on('child_added', function (snap) {
 
-		        prependPost(snap);
+		        prependMyPost(snap);
+		        var key = snap.key;
+		        firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + "/" + snap.key + "/reservation").on('child_added', function (snapReserver) {
+		        	appendReserver(key, snapReserver.val());
+		    		// console.log("lala");
+			     //    console.log(snap.val());
+			    });
+
 		    });
 	    } else {
 	    	window.location.replace('index.html');	
@@ -85,13 +92,19 @@ $(document).ready(function(){
     	$('#btnCancel').addClass('hide');
     });
 
-    function prependPost(post) {
+    function prependMyPost(post) {
     	var key = post.key;
     	console.log(key);
     	post = post.val();
     	console.log(firebase.auth().currentUser.uid);
-    	console.log(post);
+    	
+    	var obj = post.reservation;
+    	// console.log(post.reservation);
+    	// console.log(Object.keys(obj));
 
+  //   	obj.forEach(function(element) {
+		//     console.log(element);
+		// });
     	// var date = new Date(post.timestamp);
     	var add = "<div class=\"micropost\" id=\""+ key +"\">" +
 	    			"<div class=\"content\">" + 
@@ -127,12 +140,41 @@ $(document).ready(function(){
 		                    	"<i class=\"fa fa-trash\"></i>" +
 		                  	"</a>";
 		}	               
-		add = add + "</div>" +
-	              	"</div>" +
+		add = add + "</div>" ;
+		add = add + "<div class=\"actions-content\">" +
+                  "<table class=\"table\">" +
+                    "<thead>" + 
+                      "<tr>" +
+                        "<th>Username</th>" +
+                        "<th>Name</th>" +
+                        "<th>Email</th>" +
+                        "<th>Phone</th>" +
+                      "</tr>" +
+                    "</thead>" +
+                    "<tbody>" +
+                      // "<tr>
+                      //   <td>John</td>
+                      //   <td>Doe</td>
+                      //   <td>john@example.com</td>
+                      // </tr>
+                      
+                    "</tbody>" +
+                  "</table>" +
+                "</div>";
+	    add = add + "</div>" +
             	"</div>";            
 		                  	
 	                	
     	$('#microposts').prepend(add);
+    	
+    	console.log("PREPEND DONE");
+    }
+
+    function appendReserver(key, snapReserver) {
+    	// $('.micropost#'+key+' .actions .table tbody').append("<div class=\"actions-content\"><h5>ASD - " + key + "</h5></div>");
+    	var reserver = snapReserver;
+    	$('.micropost#'+key+' .actions .table tbody').append("<tr><td>"+ reserver.uname +"</td><td>"+ reserver.name +"</td><td>"+ reserver.email +"</td><td>"+ reserver.phone +"</td></tr>");
+    	console.log(snapReserver);
     }
 
     $('#microposts').on('click', 'a.linkDelete', function() {
@@ -190,7 +232,7 @@ $(document).ready(function(){
 			if (reserved){
 
 				var updates = {};
-				
+
 			  	updates['/user-posts/' + firebase.auth().currentUser.uid + '/' + id + '/heartCount'] = currentHeartCount + 1;
 
 			  	firebase.database().ref().update(updates);
