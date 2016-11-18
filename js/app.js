@@ -67,7 +67,6 @@ $(document).ready(function(){
 		    author: userdata.name,
 		    uname: userdata.username,
 		    uid: firebase.auth().currentUser.uid,
-	    	body: 'body',
 	    	title: title,
 	    	price: price,
 	    	description: description,

@@ -91,7 +91,7 @@
                         for="regPicture" >Profile Picture</label>
                   <div class="col-sm-10">
                       <input type='file' class="form-control" id="regPicture" />
-                      <img id="imgViewer" src="#" alt="your image" />                      
+                      <img id="imgViewer" height="200" src="#" alt="your image" />                      
                   </div>
                 </div>
                 <div class="form-group">
@@ -119,6 +119,7 @@
       
       var newUser = false;
       var userdata = null;
+      var imgProfile = null;
       //  $('#formRegister').submit(function(e){
       //   console.log("Register");
       //     e.preventdefault();
@@ -127,6 +128,7 @@
 
       function readURL(input) {
         if (input.files && input.files[0]) {
+            imgProfile = input.files[0];
             var reader = new FileReader();
             
             reader.onload = function (e) {
@@ -171,10 +173,6 @@
         });
         // [END authwithemail]
       });
-
-      // function writeUserData(userId, name, email, imageUrl) {
-        
-      // }
 
       $('#btnRegister').click(function(){
         var name = $('#regName').val();
@@ -264,12 +262,47 @@
               email: user.email,
               name: userdata.name,
               phone: userdata.phone,
-              profile_picture : user.photoURL
             }).then(function(e){
               newUser = false;
-              window.location.replace("timeline.html");    
+
+              if (imgProfile) {
+                var filename = imgProfile.name;
+                var storageRef = firebase.storage().ref('/user/' + user.uid + '/profile_picture/' + filename);
+
+                var uploadTask = storageRef.put(imgProfile);
+
+                // Register three observers:
+                // 1. 'state_changed' observer, called any time the state changes
+                // 2. Error observer, called on failure
+                // 3. Completion observer, called on successful completion
+                uploadTask.on('state_changed', function(snapshot){
+                  // Observe state change events such as progress, pause, and resume
+                  // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                  var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                  console.log('Upload is ' + progress + '% done');
+                  switch (snapshot.state) {
+                    case firebase.storage.TaskState.PAUSED: // or 'paused'
+                      console.log('Upload is paused');
+                      break;
+                    case firebase.storage.TaskState.RUNNING: // or 'running'
+                      console.log('Upload is running');
+                      break;
+                  }
+                }, function(error) {
+                  console.log (error);
+                }, function() {
+                  // Handle successful uploads on complete
+                  // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+                  var downloadURL = uploadTask.snapshot.downloadURL;
+                  console.log(downloadURL); 
+                  window.location.replace("timeline.html");  
+                });
+              } else {
+                window.location.replace("timeline.html");     
+              }              
             });
-          } else {
+          } 
+          else {
             window.location.replace("timeline.html");
           }
         }  
