@@ -91,7 +91,7 @@
                         for="regPicture" >Profile Picture</label>
                   <div class="col-sm-10">
                       <input type='file' class="form-control" id="regPicture" />
-                      <img id="imgViewer" height="200" src="#" alt="your image" />                      
+                      <!-- <img id="imgViewer" height="200" src="#" alt="your image" />                       -->
                   </div>
                 </div>
                 <div class="form-group">
@@ -155,23 +155,19 @@
           alert('Please enter a password.');
           return;
         }
-        // Sign in with email and pass.
-        // [START authwithemail]
+        // Sign in with email and password.
+
+        // [START auth with email]
         firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
           // Handle Errors here.
           var errorCode = error.code;
           var errorMessage = error.message;
-          // [START_EXCLUDE]
-          if (errorCode === 'auth/wrong-password') {
-            alert('Wrong password.');
-          } else {
-            alert(errorMessage);
-          }
           console.log(error);
-          // document.getElementById('quickstart-sign-in').disabled = false;
-          // [END_EXCLUDE]
+          
         });
-        // [END authwithemail]
+        // [END auth with email]
+
+
       });
 
       $('#btnRegister').click(function(){
@@ -231,32 +227,27 @@
   // }
 
         // Sign in with email and pass.
-        // [START createwithemail]
+        
 
         var error = false;
 
+        // [START create user with email]
         firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
           // Handle Errors here.
           error = true;
           var errorCode = error.code;
           var errorMessage = error.message;
-          // [START_EXCLUDE]
-          if (errorCode == 'auth/weak-password') {
-            alert('The password is too weak.');
-          } else {
-            alert(errorMessage);
-          }
+
           console.log(error);
-
-          // [END_EXCLUDE]
         });
+        // [END create user with email]
 
-      // [END createwithemail]
       });
 
       firebase.auth().onAuthStateChanged(function(user) {
         if (user) {
           if (newUser) {
+            // Save user data to database
             firebase.database().ref('users/' + user.uid).set({
               username: userdata.username,
               email: user.email,
@@ -265,29 +256,18 @@
             }).then(function(e){
               newUser = false;
 
+              // Store Profile Picture to Firebase Storage
               if (imgProfile) {
                 var filename = imgProfile.name;
                 var storageRef = firebase.storage().ref('/user/' + user.uid + '/profile_picture/' + filename);
 
                 var uploadTask = storageRef.put(imgProfile);
 
-                // Register three observers:
-                // 1. 'state_changed' observer, called any time the state changes
-                // 2. Error observer, called on failure
-                // 3. Completion observer, called on successful completion
                 uploadTask.on('state_changed', function(snapshot){
-                  // Observe state change events such as progress, pause, and resume
-                  // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
                   var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                   console.log('Upload is ' + progress + '% done');
-                  switch (snapshot.state) {
-                    case firebase.storage.TaskState.PAUSED: // or 'paused'
-                      console.log('Upload is paused');
-                      break;
-                    case firebase.storage.TaskState.RUNNING: // or 'running'
-                      console.log('Upload is running');
-                      break;
-                  }
+                  console.log(snapshot.state);
+                  
                 }, function(error) {
                   console.log (error);
                 }, function() {
@@ -306,37 +286,6 @@
             window.location.replace("timeline.html");
           }
         }  
-        // // [START_EXCLUDE silent]
-        // document.getElementById('quickstart-verify-email').disabled = true;
-        // // [END_EXCLUDE]
-        // if (user) {
-        //   // User is signed in.
-        //   var displayName = user.displayName;
-        //   var email = user.email;
-        //   var emailVerified = user.emailVerified;
-        //   var photoURL = user.photoURL;
-        //   var isAnonymous = user.isAnonymous;
-        //   var uid = user.uid;
-        //   var providerData = user.providerData;
-        //   // [START_EXCLUDE silent]
-        //   document.getElementById('quickstart-sign-in-status').textContent = 'Signed in';
-        //   document.getElementById('quickstart-sign-in').textContent = 'Sign out';
-        //   document.getElementById('quickstart-account-details').textContent = JSON.stringify(user, null, '  ');
-        //   if (!emailVerified) {
-        //     document.getElementById('quickstart-verify-email').disabled = false;
-        //   }
-        //   // [END_EXCLUDE]
-        // } else {
-        //   // User is signed out.
-        //   // [START_EXCLUDE silent]
-        //   document.getElementById('quickstart-sign-in-status').textContent = 'Signed out';
-        //   document.getElementById('quickstart-sign-in').textContent = 'Sign in';
-        //   document.getElementById('quickstart-account-details').textContent = 'null';
-        //   // [END_EXCLUDE]
-        // }
-        // // [START_EXCLUDE silent]
-        // document.getElementById('quickstart-sign-in').disabled = false;
-        // // [END_EXCLUDE]
       });
     });
 

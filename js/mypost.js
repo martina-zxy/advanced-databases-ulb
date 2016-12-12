@@ -1,6 +1,7 @@
 var db = firebase.database();
 var userId;
 $(document).ready(function(){	
+
 	var userdata = null;
 
 	firebase.auth().onAuthStateChanged(function(user) {
@@ -19,11 +20,11 @@ $(document).ready(function(){
 
 		        prependMyPost(snap);
 		        var key = snap.key;
-		        firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + "/" + snap.key + "/reservation").on('child_added', function (snapReserver) {
-		        	appendReserver(key, snapReserver);
+		        firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + "/" + snap.key + "/bid").on('child_added', function (snapReserver) {
+		        	appendBid(key, snapReserver);
 			    });
 
-			    firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + "/" + snap.key + "/reservation").on('child_removed', function(snapReserver) {
+			    firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + "/" + snap.key + "/bid").on('child_removed', function(snapReserver) {
 				    $('tr#'+snapReserver.key).remove();
 				});
 
@@ -68,7 +69,6 @@ $(document).ready(function(){
 	    	title: title,
 	    	price: price,
 	    	description: description,
-	    	heartCount: 0,
 	    	timestamp: timestamp
 	    	// authorPic: picture
 	  	};
@@ -127,11 +127,11 @@ $(document).ready(function(){
 	              	"</div>" +
 	              	"<div class=\"actions\">" +
 	                	"<div class=\"actions-content\">";
-	                		// "<a class=\"linkReserve\" id=\""+ key +"\" >";
-		if (post.heartCount > 0) {
-			add = add + "<a class=\"linkReserve\" id=\""+ key +"\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Reserved\"> <i class=\"fa fa-heart active\"></i>";
+	                		// "<a class=\"linkBid\" id=\""+ key +"\" >";
+		if (post.currentBid > post.price) {
+			add = add + "<a class=\"linkBid\" id=\""+ key +"\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Reserved\"> <i class=\"fa fa-heart active\"></i>";
 		} else {
-			add = add + "<a class=\"linkReserve\" id=\""+ key +"\" > <i class=\"fa fa-heart \"></i>";
+			add = add + "<a class=\"linkBid\" id=\""+ key +"\" > <i class=\"fa fa-heart \"></i>";
 		}
 		    add = add + "</a>";
 		if (post.uid == firebase.auth().currentUser.uid) {
@@ -147,10 +147,11 @@ $(document).ready(function(){
                   "<table class=\"table\">" +
                     "<thead>" + 
                       "<tr>" +
-                        "<th>Username</th>" +
+                        "<th>Timestamp</th>"+
                         "<th>Name</th>" +
                         "<th>Email</th>" +
                         "<th>Phone</th>" +
+                        "<th>Bid Price</th>"+
                         "<th>Action</th>" +
                       "</tr>" +
                     "</thead>" +
@@ -173,19 +174,18 @@ $(document).ready(function(){
     	console.log("PREPEND DONE");
     }
 
-    function appendReserver(key, snapReserver) {
+    function appendBid(key, snapReserver) {
     	// $('.micropost#'+key+' .actions .table tbody').append("<div class=\"actions-content\"><h5>ASD - " + key + "</h5></div>");
     	var reserver = snapReserver.val();
-    	$('.micropost#'+key+' .actions .table tbody').append("<tr id=\""+snapReserver.key+"\"><td>"+ reserver.uname +"</td><td>"+ reserver.name +"</td><td>"+ reserver.email +"</td><td>"+ reserver.phone +"</td><td><button id=\""+snapReserver.key+"\" class=\"btnReject\">Reject</button></td></tr>");
+    	$('.micropost#'+key+' .actions .table').prepend("<tr id=\""+snapReserver.key+"\"><td>"+ moment.unix(reserver.timestamp/1000).format("MM/DD/YYYY h:mm:ss a") +"</td><td>"+ reserver.name +"</td><td>"+ reserver.email +"</td><td>"+ reserver.phone +"</td><td>"+ reserver.bidAmount +"</td><td><button id=\""+snapReserver.key+"\" class=\"btnReject\">Reject</button></td></tr>");
     	console.log(snapReserver);
     }
 
     $('#microposts').on('click', 'button.btnReject', function() {
-    	var reservationId = this.id;
-		console.log(reservationId);
+    	var bidId = this.id;
 		var postId = this.closest(".micropost").id; 
-    	firebase.database().ref('/posts/'+ postId + "/reservation/" + reservationId).remove();
-    	firebase.database().ref('/user-posts/'+ userId + '/' + postId + "/reservation/" + reservationId).remove();
+    	firebase.database().ref('/posts/'+ postId + "/bid/" + bidId).remove();
+    	firebase.database().ref('/user-posts/'+ userId + '/' + postId + "/bid/" + bidId).remove();
 
     	var rejected = false;
     	var reserveRef = db.ref('/posts/'+ postId + '/heartCount');
@@ -242,7 +242,7 @@ $(document).ready(function(){
 
     });
 
-    $('#microposts').on('click', 'a.linkReserve', function() {
+    $('#microposts').on('click', 'a.linkBid', function() {
 
     	var id = this.id;
     	var reserved = false;
@@ -310,9 +310,9 @@ $(document).ready(function(){
 		$('#description-'+key).text(post.description);
 
 		if (post.heartCount > 0) {
-			$('a.linkReserve#'+key+' i').addClass('active');	
+			$('a.linkBid#'+key+' i').addClass('active');	
 		} else {
-			$('a.linkReserve#'+key+' i').removeClass('active');	
+			$('a.linkBid#'+key+' i').removeClass('active');	
 		}
 		
 		

@@ -1,6 +1,7 @@
 var db = firebase.database();
 var userId;
 $(document).ready(function(){	
+
 	var userdata = null;
 
 	firebase.auth().onAuthStateChanged(function(user) {
@@ -69,13 +70,12 @@ $(document).ready(function(){
 		    uid: firebase.auth().currentUser.uid,
 	    	title: title,
 	    	price: price,
+	    	currentBid: price,
 	    	description: description,
-	    	heartCount: 0,
-	    	timestamp: timestamp
-	    	// authorPic: picture
+	    	timestamp: firebase.database.ServerValue.TIMESTAMP
+	    	
 	  	};
 
-	  	console.log(postData);
 
 	  	var postKey = $('#editPostId').val();
 
@@ -114,7 +114,8 @@ $(document).ready(function(){
 			                "<span class=\"name\" id=\"name-"+ key +"\">" + post.author + "</span>" +
 			                "<span class=\"username\" id=\"username-"+ key +"\"> - @" + post.uname + "</span>" +
 			                "<div class=\"post title\" id=\"title-"+ key +"\">" + post.title + "</div>" +
-			                "<div class=\"post\" id=\"price-"+ key +"\">&euro;<span>" + post.price + "</span></div>" +
+			                "<div class=\"post\" id=\"startPrice-"+ key +"\">Starting Price : &euro;<span>" + post.price + "</span></div>" +
+			                "<div class=\"post\" id=\"price-"+ key +"\">Current Bid : &euro;<span>" + post.currentBid + "</span></div>" +
 			                "<div class=\"post\" id=\"description-"+ key +"\">" + post.description + "</div>" +
 		                "</div>" +
 		                // "<div class=\"right-content\">" +
@@ -123,11 +124,11 @@ $(document).ready(function(){
 	              	"</div>" +
 	              	"<div class=\"actions\">" +
 	                	"<div class=\"actions-content\">";
-	                		// "<a class=\"linkReserve\" id=\""+ key +"\" >";
-		if (post.heartCount > 0) {
-			add = add + "<a class=\"linkReserve\" id=\""+ key +"\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Reserved\"> <i class=\"fa fa-heart active\"></i>";
+	                		// "<a class=\"linkBid\" id=\""+ key +"\" >";
+		if (post.currentBid > post.price) {
+			add = add + "<a class=\"linkBid\" id=\""+ key +"\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Reserved\"> <i class=\"fa fa-bullhorn active\"></i>";
 		} else {
-			add = add + "<a class=\"linkReserve\" id=\""+ key +"\" > <i class=\"fa fa-heart \"></i>";
+			add = add + "<a class=\"linkBid\" id=\""+ key +"\" > <i class=\"fa fa-bullhorn \"></i>";
 		}
 		    add = add + "</a>";
 		if (post.uid == firebase.auth().currentUser.uid) {
@@ -174,8 +175,66 @@ $(document).ready(function(){
 
     });
 
-    $('#microposts').on('click', 'a.linkReserve', function() {
+    $('#submitBid').click(function(){
+    	var bid = false;
+    	var bidAmount = $('#bidAmount').val();
+
+    	if(bidAmount == "" || bidAmount == null) {
+    		alert("You have to fill in the bid amount"); 
+    		return;
+    	}
+
+    	var postId = $('#bidModalPostId').val();
+    	
+    	var bidRef = db.ref('/posts/'+ postId + '/currentBid');
+
+		bidRef.transaction(function (current_value) {
+			if(current_value < bidAmount) {
+				bid = true;
+				return bidAmount;				
+			}
+		}).then(function(){
+			if (bid) {
+				var uid = $('#uid-' + postId).val();
+				var updates = {};
+				
+			  	updates['/user-posts/' + uid + '/' + postId + '/currentBid'] = bidAmount;			
+
+			//   	// push reserving user data
+			  	var bidKey = firebase.database().ref().child('posts/'+ postId + '/bid').push().key;
+
+			  	var bidData = {
+			  		uid: firebase.auth().currentUser.uid,
+			  		uname: userdata.username,
+				    name: userdata.name,
+				    email: userdata.email,
+				    phone: userdata.phone,
+				    bidAmount: bidAmount,
+			    	timestamp: new Date().getTime()
+			  	};
+			  	updates['/user-posts/' + uid + '/' + postId + '/bid/' + bidKey] = bidData;
+			  	// updates['/posts/'+ postId + '/bid/' + bidKey] = bidData;
+
+			  	firebase.database().ref().update(updates).then(function(){
+			  		console.log(updates);
+			  	});
+
+				alert('Success!');	
+				$('#bidAmount').val('');
+				$('#bidModal').modal('hide');
+			} else {
+				alert("Bidding has failed, check your input");
+			}
+		});
+    });
+
+    $('#microposts').on('click', 'a.linkBid', function() {
     	var id = this.id;
+    	$('#bidModalPostId').val(id);
+    	$('#bidModalLabel').text($('#title-' + id).text());
+    	$('#currentBid').text($('#price-' + id + ' span').text());
+    	$('#bidModal').modal('show');
+    	return;
     	var reserved = false;
     	var currentHeartCount;
 
@@ -264,23 +323,22 @@ $(document).ready(function(){
 		var post = snap.val();
 
 		$('#title-'+key).text(post.title);
-		$('#price-'+key+' span').text(post.price);
+		$('#price-'+key+' span').text(post.currentBid);
+		$('#startPrice-'+key+' span').text(post.price);
 		$('#description-'+key).text(post.description);
 
-		if (post.heartCount > 0) {
-			$('a.linkReserve#'+key+' i').addClass('active');	
+		if (post.currentBid > post.price) {
+			$('a.linkBid#'+key+' i').addClass('active');	
 		} else {
-			$('a.linkReserve#'+key+' i').removeClass('active');	
-		}
-		
-		
+			$('a.linkBid#'+key+' i').removeClass('active');	
+		}		
 	});
 
 	firebase.database().ref('/posts').on('child_removed', function(childSnapshot) {
 
 		console.log(childSnapshot.key);
 		console.log(childSnapshot);
-	    alert('child removed!');
+	    alert('Post has been removed!');
 	    $('.micropost#'+childSnapshot.key).remove();
 	});
 
