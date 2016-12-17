@@ -14,6 +14,9 @@ $(document).ready(function(){
 			  $('#username-navbar').text(userdata.username);
 			  $('#username-sidebar').text('@' + userdata.username);
 			  $('#user-fullname').text(userdata.name);
+			  $('.img-avatar').each(function() {
+				    $(this).attr('src',userdata.picture);
+				});
 			});
 
 			firebase.database().ref('/user-posts/' + userId).on('child_added', function (snap) {

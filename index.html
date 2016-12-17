@@ -253,6 +253,7 @@
               email: user.email,
               name: userdata.name,
               phone: userdata.phone,
+              picture: null
             }).then(function(e){
               newUser = false;
 
@@ -274,6 +275,17 @@
                   // Handle successful uploads on complete
                   // For instance, get the download URL: https://firebasestorage.googleapis.com/...
                   var downloadURL = uploadTask.snapshot.downloadURL;
+                  console.log(downloadURL);
+                  var updates = {};
+                  updates['users/' + user.uid + '/picture'] = downloadURL;
+                  firebase.database().ref().update(updates).then(function(e){
+                    console.log(e);
+                  });
+                  // firebase.database().ref('users/' + user.uid + "/picture").set({
+                  //   downloadURL
+                  // }).then(function(e){
+
+                  // });
                   console.log(downloadURL); 
                   window.location.replace("timeline.html");  
                 });

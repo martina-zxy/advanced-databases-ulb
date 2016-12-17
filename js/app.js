@@ -18,6 +18,10 @@ $(document).ready(function(){
 				$('#username-navbar').text(userdata.username);
 				$('#username-sidebar').text('@' + userdata.username);
 				$('#user-fullname').text(userdata.name);
+				$('.img-avatar').each(function() {
+				    $(this).attr('src',userdata.picture);
+				});
+				
 			});
 
 			firebase.database().ref('/posts').on('child_added', function (snap) {
@@ -192,6 +196,8 @@ $(document).ready(function(){
 			if(current_value < bidAmount) {
 				bid = true;
 				return bidAmount;				
+			} else {
+				bid = false;
 			}
 		}).then(function(){
 			if (bid) {
@@ -200,7 +206,7 @@ $(document).ready(function(){
 				
 			  	updates['/user-posts/' + uid + '/' + postId + '/currentBid'] = bidAmount;			
 
-			//   	// push reserving user data
+				// push reserving user data
 			  	var bidKey = firebase.database().ref().child('posts/'+ postId + '/bid').push().key;
 
 			  	var bidData = {
