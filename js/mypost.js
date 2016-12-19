@@ -37,66 +37,6 @@ $(document).ready(function(){
 	    }
     });
 
-    $('#share').click(function(){
-    	var title = $('#postTitle').val();
-    	var price = $('#postPrice').val();
-    	var description = $('#postDescription').val();
-
-    	var errField = [];
-    	if(title == '' || title == null) {
-    		errField.push('Title');
-    	}
-    	if(price == '' || price == null) {
-    		errField.push('Price');
-    	}
-
-    	if(description == '' || description == null) {
-    		errField.push('Description');
-    	}
-
-    	if(errField.length > 0) {
-    		alert(errField + ' should not be empty');
-    		return;
-    	}
-
-    	var timestamp = new Date().getTime();
-    	
-    	console.log(timestamp);
-    	console.log("Snapshot full date: " + new Date(timestamp));
-
-    	var postData = {
-		    author: userdata.name,
-		    uname: userdata.username,
-		    uid: firebase.auth().currentUser.uid,
-	    	body: 'body',
-	    	title: title,
-	    	price: price,
-	    	description: description,
-	    	timestamp: timestamp
-	    	// authorPic: picture
-	  	};
-
-	  	console.log(postData);
-
-	  	var postKey = $('#editPostId').val();
-
-	  	if(postKey == "" || postKey == null) {
-	  		postKey = firebase.database().ref().child('posts').push().key;
-	  	}	
-
-    	var updates = {};
-	  	updates['/posts/' + postKey] = postData;
-	  	updates['/user-posts/' + firebase.auth().currentUser.uid + '/' + postKey] = postData;
-
-	  	firebase.database().ref().update(updates);
-
-		$('#postTitle').val('');	  	
-		$('#postPrice').val('');	
-		$('#postDescription').val('');	  	
-		$('#txtBtnShare').text('Share');
-    	$('#btnCancel').addClass('hide');
-    });
-
     function prependMyPost(post) {
     	var key = post.key;
     	console.log(key);
@@ -104,13 +44,6 @@ $(document).ready(function(){
     	console.log(firebase.auth().currentUser.uid);
     	
     	var obj = post.reservation;
-    	// console.log(post.reservation);
-    	// console.log(Object.keys(obj));
-
-  //   	obj.forEach(function(element) {
-		//     console.log(element);
-		// });
-    	// var date = new Date(post.timestamp);
     	var add = "<div class=\"micropost\" id=\""+ key +"\">" +
 	    			"<div class=\"content\">" + 
 		                "<div class=\"avatar-content\">" +
@@ -124,9 +57,6 @@ $(document).ready(function(){
 			                "<div class=\"post\" id=\"price-"+ key +"\">&euro;<span>" + post.price + "</span></div>" +
 			                "<div class=\"post\" id=\"description-"+ key +"\">" + post.description + "</div>" +
 		                "</div>" +
-		                // "<div class=\"right-content\">" +
-		                //   	"<span>" + '20 min' + "</span>" +
-		                // "</div>" +
 	              	"</div>" +
 	              	"<div class=\"actions\">" +
 	                	"<div class=\"actions-content\">";
@@ -159,12 +89,6 @@ $(document).ready(function(){
                       "</tr>" +
                     "</thead>" +
                     "<tbody>" +
-                      // "<tr>
-                      //   <td>John</td>
-                      //   <td>Doe</td>
-                      //   <td>john@example.com</td>
-                      // </tr>
-                      
                     "</tbody>" +
                   "</table>" +
                 "</div>";
@@ -190,31 +114,31 @@ $(document).ready(function(){
     	firebase.database().ref('/posts/'+ postId + "/bid/" + bidId).remove();
     	firebase.database().ref('/user-posts/'+ userId + '/' + postId + "/bid/" + bidId).remove();
 
-    	var rejected = false;
-    	var reserveRef = db.ref('/posts/'+ postId + '/heartCount');
-		reserveRef.transaction(function (current_value) {
-			if(current_value >= 1) {
-				currentHeartCount = current_value;
-				console.log(current_value);
-				rejected = true;
-				return (current_value || 1) - 1;				
-			}
-			else {
-				alert ('Do not play with the JS!');
-				return;
-			}
-		}).then(function(){
-			if (rejected){
+  //   	var rejected = false;
+  //   	var reserveRef = db.ref('/posts/'+ postId + '/heartCount');
+		// reserveRef.transaction(function (current_value) {
+		// 	if(current_value >= 1) {
+		// 		currentHeartCount = current_value;
+		// 		console.log(current_value);
+		// 		rejected = true;
+		// 		return (current_value || 1) - 1;				
+		// 	}
+		// 	else {
+		// 		alert ('Do not play with the JS!');
+		// 		return;
+		// 	}
+		// }).then(function(){
+		// 	if (rejected){
 
-				var updates = {};
+		// 		var updates = {};
 
-			  	updates['/user-posts/' + userId + '/' + postId + '/heartCount'] = currentHeartCount - 1;
+		// 	  	updates['/user-posts/' + userId + '/' + postId + '/heartCount'] = currentHeartCount - 1;
 
-			  	firebase.database().ref().update(updates);
+		// 	  	firebase.database().ref().update(updates);
 
-				alert('Reservation has been rejected');
-			}
-		});
+		// 		alert('Reservation has been rejected');
+		// 	}
+		// });
     });
 
     $('#microposts').on('click', 'a.linkDelete', function() {
@@ -227,12 +151,6 @@ $(document).ready(function(){
     $('#microposts').on('click', 'a.linkUpdate', function() {
 
     	var id = this.id;
-    	// var el = $('.micropost#'+id+ ' .post-content');
-		// console.log(el.find('.name').text());
-
-		// $()($('#title-'+id).text());
-		// console.log($('#price-'+id).text());
-		// console.log($('#description-'+id).text());
 
     	$('#postTitle').val($('#title-'+id).text());
     	$('#postPrice').val($('#price-'+id+' span').text());
@@ -330,8 +248,3 @@ $(document).ready(function(){
 	});
 
 });
-
-
-// var bigOne = document.getElementById('bigOne');
-// var dbRef = firebase.database().ref().child('text');
-// dbRef.on('value', snap => bigOne.innerHTML = "<b>" + snap.val() + "</b>");

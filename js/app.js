@@ -161,12 +161,7 @@ $(document).ready(function(){
     $('#microposts').on('click', 'a.linkUpdate', function() {
 
     	var id = this.id;
-    	// var el = $('.micropost#'+id+ ' .post-content');
-		// console.log(el.find('.name').text());
 
-		// $()($('#title-'+id).text());
-		// console.log($('#price-'+id).text());
-		// console.log($('#description-'+id).text());
 
     	$('#postTitle').val($('#title-'+id).text());
     	$('#postPrice').val($('#price-'+id+' span').text());
@@ -248,16 +243,6 @@ $(document).ready(function(){
     		alert("You can not reserve your own post!");
     		return;
     	}
-
-    // 	if(postKey == "" || postKey == null) {
-	  	// 	postKey = firebase.database().ref().child('posts').push().key;
-	  	// }	
-
-    // 	var updates = {};
-	  	// updates['/posts/' + postKey] = postData;
-	  	// updates['/user-posts/' + firebase.auth().currentUser.uid + '/' + postKey] = postData;
-
-	  	// firebase.database().ref().update(updates);
 
     	var reserveRef = db.ref('/posts/'+ id + '/heartCount');
 		reserveRef.transaction(function (current_value) {
@@ -349,8 +334,3 @@ $(document).ready(function(){
 	});
 
 });
-
-
-// var bigOne = document.getElementById('bigOne');
-// var dbRef = firebase.database().ref().child('text');
-// dbRef.on('value', snap => bigOne.innerHTML = "<b>" + snap.val() + "</b>");
